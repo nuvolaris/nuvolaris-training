@@ -19,7 +19,7 @@
 -->
 # nuvolaris-training
 
-This repo includes our test suite and the scripts to build our test environments.
+This repo includes training material.
 
 You can discuss it in the #[nuvolaris-training](https://discord.gg/TeNA2Pa5Nu) discord channel and in the forum under the category [training](https://github.com/nuvolaris/nuvolaris/discussions/categories/training).
 
