@@ -8,10 +8,10 @@ backgroundImage: url('https://marp.app/assets/hero-background.jpg')
 html: true
 ---
 
-![bg left:40% 80%](./image/logo-transparent.png)
+![bg left:40% 80%](./image/logo-full-transparent.png)
 
 # **Nuvolaris Trainings**
-## The Nuvolaris Project
+## 1. Kubernetes Operator
 
 A distribution for Serverless Everywhere
 
@@ -24,18 +24,16 @@ https://www.nuvolaris.org
 ---
 ![bg fit](./image/components.png)
 
-
 ---
 # Required OpenSource Paperwork
 ## Signing the Open Source ICLA
 
 - Download the pdf:
- `bit.ly/nuvolaris-ical`
+ `bit.ly/nuvolaris-icla`
 - Sign and send to 
-   `secretary@apache.org`
+  `secretary@apache.org`
 - Carbony copy to us: 
-    `secretary@nuvolaris.io`
-     - or provide us any other proof you signed it (like being Apache Contributor etc)
+  `secretary@nuvolaris.io`
 
 ---
 # Before contributing
