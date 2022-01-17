@@ -344,6 +344,116 @@ def sample_delete(spec, **kwargs):
 
 ---
 
+![bg](https://fakeimg.pl/800x600/fff/000/?text=Kustomize)
+
+---
+
+# Interacting with Kubernetes
+
+- `kopf` does  *not* provide how to interact with Kubernetes
+  - You can use any other api like `pykube`or others
+
+- We use... `kubectl` and `kustomize`
+  - It may look "odd" to use an external command line tool
+  - However, this allows compatibility with command line tools
+    - avoding "strange" templating
+    - easier development and debug
+
+---
+# About `kustomize`
+
+- Originally a separate tool, now part of `kubectl`
+  - It works "customizing" sets of descriptors with rules
+  - support many ways of *patching* the JSON/YAML 
+  - **NO TEMPLATING** (huge win over `helm`!)
+
+- You simply do `kubectl apply -k <folder>`
+  - It will search for `kustomization.yaml`
+  - It will produce the output sent to Kubernetes
+
+- Debug the output without applying with:
+  `kubectl kustomize <folder>`
+---
+
+## Simple `kustomizationl.yaml` with patch
+
+``` yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- demo-deployment.yaml
+patches:
+ - path: patch.yaml
+
+```
+
+- put it in a folder `deploy` and `apply -k deploy`
+---
+# Sample patch of a `Deployment`
+
+- We want to change the replica count
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deploy
+spec:
+  replicas: 2
+```
+- Intuitively, provide enough context to locate the descriptor
+- Provide the replaced fields
+---
+
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
+
+---
+# Using `kubectl` from the operator
+```python
+# generate patch
+def patch(n):
+  return f"""apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deploy
+spec:
+  replicas: {n}
+"""
+# run kubectl
+def kubectl(cmd, patch):
+  with open(f"deploy/patch.yaml", "w") as f:
+    f.write(patch)
+  res = subprocess.run(["kubectl", cmd, "-k", "deploy"], capture_output=True)
+  return res.stdout.decode()
+```
+---
+
+# Implementing the operator
+
+```python
+@kopf.on.create('nuvolaris.org', 'v1', 'samples')
+def sample_create(spec, **kwargs):
+    count = spec["count"]
+    message = kubectl("apply", patch(count))
+    return { "message": message }
+
+@kopf.on.delete('nuvolaris.org', 'v1', 'samples')
+def sample_delete(spec, **kwargs):
+    count = spec["count"]
+    message = kubectl("delete", patch(count))
+    return { "message": "delete" }
+```
+
+---
+# Packaging
+
+- Create a Dockerfile embedding the operator
+  - You need `poetry`, `kopf` an `kubectl` in the image
+- Deploy the POD with the right permissions
+  - You need to setup *Kuberbetes RBAC*
+  - `ServiceAccount` and `ClusterRoleBinding`
+- See `nuvolaris/nuvolaris-operator` for an example
+---
 ![bg](https://fakeimg.pl/800x600/fff/000/?text=Contributing)
 
 ---
@@ -360,5 +470,4 @@ def sample_delete(spec, **kwargs):
 - Send to 
   `To: secretary@apache.org`
   `Cc: secretary@nuvolaris.io`
-
 
