@@ -1,0 +1,62 @@
+import re, sys, tempfile
+if len(sys.argv) < 2:
+    print("usage: <input>")
+    sys.exit() 
+input = sys.argv[1]
+file = input.split("/")[-1]
+dir = input[0:-len(file)]
+name =  file[0:-3]
+tmpdir = tempfile.TemporaryDirectory()
+outdir = f"{dir}/pres"
+!mkdir -p {tmpdir.name} {outdir}
+!marp --allow-local-files -o {tmpdir.name}/{name}  --images png {input}
+!marp --allow-local-files {input} -o {dir}/{name}.pdf --pdf
+
+def copy(src, dst):
+    !cp {src} {dst}
+    #pass
+
+def slurp_file(f, dst):
+    print("*** slurp_file")
+    with open(dst, "w") as out:
+        while True:
+            line = f.readline()
+            if line.rstrip() == '```': return
+            out.write(line)
+            #print(">>>", line)
+
+count = -1
+line = ""
+f = open(input, "r")
+
+while True:
+    line = f.readline()
+    if not line: break
+    line = line.rstrip()
+    if line != "---":
+        continue
+    count +=1
+    if count < 1: continue
+    prefix = f"{tmpdir.name}/{name}.%03d." % count
+    curr = "%spng" % prefix
+    #print(prefix)
+    line = f.readline()
+    if not line: break
+    if line.find("<!--!-->") != -1:
+        line = f.readline()
+    line = line.rstrip()
+    if line.startswith("!["):
+        m = re.search('\((.*/(.*))\)', line)
+        src = f"{dir}/{m.group(1)}"
+        dst = f"{outdir}/{name}.%03d.png" % count
+        print("copy_img", src, dst)
+        copy(src,dst)
+    elif line.startswith('```'):
+        ext = line[3:]
+        dst = f"{outdir}/{name}.%03d.%s" % (count,ext)
+        print("slurp_file", dst )
+        slurp_file(f, dst)
+    else:
+        dst = f"{outdir}/{name}.%03d.png" % count
+        print("copy_file",curr,dst)
+        copy(curr[0:-4],dst)

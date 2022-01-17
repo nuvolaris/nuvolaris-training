@@ -23,4 +23,5 @@ header:
   paths-ignore:
     - 'LICENSE'
     - '*.excalidraw'
+    - 'pres.md'
  

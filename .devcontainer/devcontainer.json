@@ -30,6 +30,8 @@
 		"stuart.unique-window-colors",
 		"oderwat.indent-rainbow",
 		"eamodio.gitlens",
-		"mhutchie.git-graph"
+		"mhutchie.git-graph",
+		"nicoespeon.slides",
+		"saviorisdead.theme-githubcleanwhite"
 	]
 }

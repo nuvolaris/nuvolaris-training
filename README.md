@@ -23,3 +23,21 @@ This repo includes training material.
 
 You can discuss it in the #[nuvolaris-training](https://discord.gg/TeNA2Pa5Nu) discord channel and in the forum under the category [training](https://github.com/nuvolaris/nuvolaris/discussions/categories/training).
 
+# Usage
+
+You need to 
+
+- Install the SF Mono font 
+- Associate the command "Terminal: Run Selected Text in Active Terminal" to "control-enter"
+- Open the folder and then repoen in container
+
+You are ready. 
+
+Remember those keys:
+
+- `control-shift-p` to enter in presentation mode
+- `control-shift-forward` and `control-shift-backward` to move
+- `control-j` to open/close the terminal
+
+
+
