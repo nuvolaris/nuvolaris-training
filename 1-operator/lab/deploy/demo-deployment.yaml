@@ -15,7 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- demo-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80

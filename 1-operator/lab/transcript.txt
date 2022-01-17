@@ -25,14 +25,14 @@ kubectl get ns
 kubectl config set-context --current --namespace demo
 
 ## Create a pod
-cat pod.yaml
+cat demo-pod.yaml
 
 kubectl apply -f demo-pod.yaml
 kubectl get pod
 kubectl delete pod demo-pod
 
 ## Create a deployment
-cat demo-deploy.yaml
+cat demo-deployment.yaml
 kubectl apply -f demo-deployment.yaml
 kubectl get deploy
 kubectl get pod
@@ -42,32 +42,37 @@ kubectl get pod
 
 ###
 
-
 ## create crd
 kubectl apply -f demo-crd.yaml
 kubectl get crd
+kubectl create namespace demo
 kubectl apply -f demo-obj.yaml
 kubectl get samples
 kubectl delete sample obj
 
 ## start simple op
+poetry init
+poetry install kopf
 poetry run kopf run -n demo demo1.py
 # in another terminal
+cd 1-operator/lab
+cat demo-obj.yaml
 kubectl apply -f demo-obj.yaml
 kubectl delete -f demo-obj.yaml
 
 ###
 
 # no kustomization
+mkdir deploy
 cat kustomization1.yaml
-cp  kustomization1.yaml deploy/kustomization.yaml
-kubectl kustomize deploy
+cp demo-deployment.yaml deploy
 
-# change replicas
 cat kustomization2.yaml
-cat patch.yaml
 cp kustomization2.yaml deploy/kustomization.yaml
+
+cat patch.yaml
 cp patch.yaml deploy/patch.yaml
+
 kubectl kustomize deploy
 
 # run operator 

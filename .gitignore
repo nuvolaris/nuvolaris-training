@@ -16,3 +16,6 @@
 # under the License.
 #
 .DS_Store
+.*-version
+__pycache__/
+lab/deploy/
