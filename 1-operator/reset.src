@@ -1,0 +1,4 @@
+cd lab
+rm -Rvf deploy
+init.sh destroy
+init.sh

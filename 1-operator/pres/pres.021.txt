@@ -1,0 +1,7 @@
+cat demo-deployment.yaml
+kubectl apply -f demo-deployment.yaml
+kubectl get deploy
+kubectl get pod
+kubectl delete -f demo-deployment.yaml
+kubectl get deploy
+kubectl get pod

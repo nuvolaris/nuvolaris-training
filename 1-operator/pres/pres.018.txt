@@ -1,0 +1,4 @@
+cat demo-pod.yaml
+kubectl apply -f demo-pod.yaml
+kubectl get pod
+kubectl delete pod demo-pod

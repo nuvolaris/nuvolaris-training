@@ -59,13 +59,12 @@ https://www.nuvolaris.io
 # Operator Frameworks
   - **Operator Framework**: ansible/helm/go
   - **Kudo**: a declarative, yaml based framework
-  - **metacontroller**: generic, with hooks in any languages
-  - **shell-operator**: write operators in bash
-  - **kubebuilder**: Go based operator
-  - **kopf**: Python based Operator
+  - **Metacontroller**: generic, with hooks in any languages
+  - **Shell-operator**: write operators in bash
+  - **Kubebuilder**: Go based operator
+  - **Kopf**: Python based Operator
 
   also exists Java, Rust, Elixir, Javascript based operator frameworks
-
 
 ---
 
@@ -89,14 +88,24 @@ https://www.nuvolaris.io
 ![bg fit](./image/start-dev-env.png)
 
 ---
-# Kubernetes `kubectl`
+# Test Nuvolaris Operator
 
-- $ `kubectl get nodes`
+- Open `nuvolaris-operator/workspace.code-workspace`
+
+-  `kubectl get nodes`
 ```
 NAME                      STATUS   ROLES                  AGE   VERSION
 nuvolaris-control-plane   Ready    control-plane,master   41m   v1.21.1
 nuvolaris-worker          Ready    <none>                 41m   v1.21.1
 ```
+
+- Test
+```
+cd tests
+task deploy
+task wsk
+```
+
 
 ---
 
@@ -108,11 +117,18 @@ nuvolaris-worker          Ready    <none>                 41m   v1.21.1
 
 ---
 # <!--!--> Kubernetes `kubectl` Commands
-```sh
+```txt
+# checking nodes and namespaces
 kubectl get nodes
 kubectl get ns
 kubectl create ns demo
 kubectl get ns
+# default namespace
+kubectl config set-context --current --namespace demo
+# various resourcs
+kubectl get pod
+kubectl get deploy
+kubectl get svc
 ```
 
 ---
@@ -132,24 +148,28 @@ kubectl get ns
 
 ![bg fit](./image/map.png)
 
-
 ---
 
-# Structure of a descriptor
+# Structure of a Kubernetes resource
 
 - Common: Header and Metadata
 ```yaml
-apiVersion: v1
-kind: Namespace
+apiVersion: v1                # resources are versioned AND grouped
+kind: Pod                     # each resource has a `kind`
 metadata:
-  name: nuvolaris
+  name: demo-pod              # name of the resources
+  namespace: demo             # grouped in a namespace
+  labels:                     # used to locate resources
+     app: demo                # formact key=value
 ```
-- `spec`: changes according tothe kind
+- `spec`: changes according to the kind
 - `status`: maintained by the system
-
 
 ---
 # Simple Descriptor: a Pod
+
+- A pod is a *set* of containers
+  - the closest thing to `docker run`
 
 ```yaml
 apiVersion: v1
@@ -167,8 +187,11 @@ spec:
 
 ---
 # <!--!--> Deploy Pod
-```sh
-TODO
+```txt
+cat demo-pod.yaml
+kubectl apply -f demo-pod.yaml
+kubectl get pod
+kubectl delete pod demo-pod
 ```
 
 ---
@@ -210,11 +233,16 @@ It creates `replica` times the pods specified in the template
 ```
 
 ---
-# <!--!--> Deploy Deployment
-```sh
-TOOO
+# <!--!--> Deploy a Deployment
+```txt
+cat demo-deployment.yaml
+kubectl apply -f demo-deployment.yaml
+kubectl get deploy
+kubectl get pod
+kubectl delete -f demo-deployment.yaml
+kubectl get deploy
+kubectl get pod
 ```
-
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+CRD)
@@ -227,8 +255,8 @@ TOOO
 ![](./image/deployment-sample.png)
 
 ## What they do?
-- create a set of resources
-- control them as an unit
+- create a set of resources, then control them as an unit
+- **Operators** are an extension of the concept
 ---
 
 # Custom Resources Definitions
@@ -268,10 +296,10 @@ kind: CustomResourceDefinition
 metadata:
   name: samples.nuvolaris.org
 spec:
-  scope: Namespaced
-  group: nuvolaris.org
+  scope: Namespaced          # Namespaced or Cluster wide 
+  group: nuvolaris.org       # Group (resources are grouped)
   names:
-    kind: Sample
+    kind: Sample             # Kind (and its names)
     plural: samples
     singular: sample
     shortNames:
@@ -309,25 +337,30 @@ spec:
 ---
 
 # <!--!--> Demo
-```sh
-demo
+```txt
+cat demo-crd.yaml
+kubectl apply -f demo-crd.yaml
+kubectl get crd
+cat demo-obj.yaml
+kubectl apply -f demo-obj.yaml
+kubectl get samples
+kubectl delete sample obj
 ```
 ---
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Kustomize)
 
 ---
-
 # Interacting with Kubernetes
 
-- `kopf` does  *not* provide how to interact with Kubernetes
-  - You can use any other api like `pykube`or others
+- Resources needs to be adapted to various cases
+  - there are literally tens of solutions for this problem
+  - `helm`is very used, but... 
+    - templating YAML is not a great idea!
+    - lot of code just to manage whitespaces!
 
-- We use... `kubectl` and `kustomize`
-  - It may look "odd" to use an external command line tool
-  - However, this allows compatibility with command line tools
-    - avoding "strange" templating
-    - easier development and debug
-
+- We are goingo to use `kustomize`
+  - part of `kubectl` 
+  - much easier development and debug
 ---
 # About `kustomize`
 
@@ -343,7 +376,6 @@ demo
 - Debug the output without applying with:
   `kubectl kustomize <folder>`
 ---
-
 ## Simple `kustomizationl.yaml` with patch
 
 ``` yaml
@@ -373,6 +405,23 @@ spec:
 - Intuitively, provide enough context to locate the descriptor
 - Provide the replaced fields
 
+---
+# <!--!--> Kustomize example
+```txt
+cat demo-deployment.yaml | grep replica
+# create a customization
+mkdir deploy
+cp demo-deployment.yaml deploy
+cp patch.yaml deploy
+cp kustomization.yaml deploy
+#
+kubectl kustomize deploy | grep replica
+kubectl apply -k deploy
+kubectl get po
+```
+
+---
+![bg](https://fakeimg.pl/800x600/fff/000/?text=Conclusion)
 
 ---
 # What is next?
@@ -384,13 +433,11 @@ spec:
 - Implementing the Operator
 
 ---
-![bg](https://fakeimg.pl/800x600/fff/000/?text=Contributing)
-
----
 ![bg fit](./image/components.png)
 
 ---
 # Contributing to Nuvolaris
+
 ## Before sending a Pull Request you need:
 
 - Add **Apache License** headers to each file:
