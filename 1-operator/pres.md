@@ -11,28 +11,23 @@ html: true
 ![bg left:40% 80%](./image/logo-full-transparent.png)
 
 # **Nuvolaris Trainings**
-## Developing Kubernetes Operators in Python
+## Nuvolaris Operator
 
-Part 1: Kubernetes Operators
+Part 1: Introducting Kubernetes Operators
 
 https://www.nuvolaris.io
 
 ---
 
-# Agenda
+# Agenda (Part 1)
 
-- Kubernetes Introduction
+- The Nuvolaris Project
 - Development Environment
-- Kubernetes Operators
-- Creating an Operator
-- Deploying an Operator
-- Contributing to Nuvolaris
+- Kubernetes 101
+- Custom Resource Definitions
+- Kustomize
 
 ---
-
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes)
-
---- 
 # What is Kubernetes ?
 
 - In theory, an **orchestrator**
@@ -46,7 +41,7 @@ https://www.nuvolaris.io
 
 ---
 
-![bg fit](image/kubernetes.png)
+![bg fit](./image/architecture.png)
 
 ---
 # Kubernetes Operators
@@ -59,20 +54,8 @@ https://www.nuvolaris.io
   - Creating instances conforming to the CRD
     - that describes the *desidered state*
   - **Writing code that brings the system to this state**
----
-# <!--!--> Kubernetes
-```sh
-kubectl get nodes
-kubectl get ns
-kubectl create ns demo
-kubectl get ns
-```
 
 ---
-
-![bg fit](./image/architecture.png)
- 
- ---
 # Operator Frameworks
   - **Operator Framework**: ansible/helm/go
   - **Kudo**: a declarative, yaml based framework
@@ -86,13 +69,55 @@ kubectl get ns
 
 ---
 
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Descriptors)
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Dev+Environment)
 
+---
+## VSCode-based Development Environment
+
+- Clone the repositories (multiple and linked)
+  ```
+  git clone https://github.com/nuvolaris/nuvolaris 
+  --recurse-submodules
+  ```
+  - do not forget **`--recurse-submodules`**
+
+- Open the folder `nuvolaris` with VSCode:
+  - Command Line: `code nuvolaris`
+- Open the workspaces in subfolders: `workspace.code-workspace`
+
+---
+![bg fit](./image/start-dev-env.png)
+
+---
+# Kubernetes `kubectl`
+
+- $ `kubectl get nodes`
+```
+NAME                      STATUS   ROLES                  AGE   VERSION
+nuvolaris-control-plane   Ready    control-plane,master   41m   v1.21.1
+nuvolaris-worker          Ready    <none>                 41m   v1.21.1
+```
 
 ---
 
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+101)
+
+---
+
+![bg fit](image/kubernetes.png)
+
+---
+# <!--!--> Kubernetes `kubectl` Commands
+```sh
+kubectl get nodes
+kubectl get ns
+kubectl create ns demo
+kubectl get ns
+```
+
+---
 ### Kubernetes Descriptors Concepts 
-- It is declarative:
+- Kubernetes is declarative:
   - You **describe** what you want to get by the system
   - Kubernetes will bring the system to the desidered state
 
@@ -138,7 +163,13 @@ spec:
       image: nginx
       ports:
       - containerPort: 80
-````
+```
+
+---
+# <!--!--> Deploy Pod
+```sh
+TODO
+```
 
 ---
 # Nested Descriptor: a Deployment
@@ -158,6 +189,8 @@ spec:
     matchLabels:
       app: nginx
 ```
+
+
 ---
 # Deployment template
 
@@ -176,39 +209,12 @@ It creates `replica` times the pods specified in the template
         - containerPort: 80
 ```
 
-
 ---
-
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Dev+Environment)
-
----
-## VSCode-based Development Environment
-
-- Clone the repositories (multiple and linked)
-  ```
-  git clone https://github.com/nuvolaris/nuvolaris 
-  --recurse-submodules
-  ```
-  - do not forget **`--recurse-submodules`**
-
-- Open the folder `nuvolaris` with VSCode:
-  - Command Line: `code nuvolaris`
-- Open the workspaces in subfolders: `workspace.code-workspace`
-
----
-![bg fit](./image/start-dev-env.png)
-
----
-# Kubernetes `kubectl`
-
-- $ `kubectl get nodes`
-```
-NAME                      STATUS   ROLES                  AGE   VERSION
-nuvolaris-control-plane   Ready    control-plane,master   41m   v1.21.1
-nuvolaris-worker          Ready    <none>                 41m   v1.21.1
+# <!--!--> Deploy Deployment
+```sh
+TOOO
 ```
 
-#### Demo: `nuvolaris-controller/training/transcript1.txt`
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+CRD)
@@ -300,61 +306,14 @@ metadata:
 spec:
   count: 2
 ```
-- Demo: `nuvolaris/nuvolaris-controller/training/transcript2.txt`
 ---
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Operator)
 
----
-# About `kopf`
-- See kopf.readthedocs.io
-
-- Python based
-  - provied an handy `kopf` cli runner
-
-- Handlers for the various Kubernetes events:
-  - `@kopf.on.login`
-  - `@kopf.on.create`
-  - `@kopf.on.delete`
-
-- It does not manage Kubernetes API 
----
-# Login
-
-- Kopf supports various autentication
-
-  - Code to support either your `~/.kube/config` or the service token
-
-```python
-@kopf.on.login()
-def sample_login(**kwargs):
-    token = '/var/run/secrets/kubernetes.io/serviceaccount/token'
-    if os.path.isfile(token):
-        logging.debug("found serviceaccount token: login via pykube in kubernetes")
-        return kopf.login_via_pykube(**kwargs)
-    logging.debug("login via client")
-    return kopf.login_via_client(**kwargs)
+# <!--!--> Demo
+```sh
+demo
 ```
-
 ---
-# Handling object creation and deletion
-
-```python
-@kopf.on.create('nuvolaris.org', 'v1', 'samples')
-def sample_create(spec, **kwargs):
-    print(spec)
-    return { "message": "created" }
-```
-
-```python
-@kopf.on.delete('nuvolaris.org', 'v1', 'samples')
-def sample_delete(spec, **kwargs):
-    print(spec)
-    return { "message": "delete" }
-```
-
----
-
-![bg](https://fakeimg.pl/800x600/fff/000/?text=Kustomize)
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Kustomize)
 
 ---
 
@@ -413,56 +372,17 @@ spec:
 ```
 - Intuitively, provide enough context to locate the descriptor
 - Provide the replaced fields
----
 
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
 
 ---
-# Using `kubectl` from the operator
-```python
-# generate patch
-def patch(n):
-  return f"""apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: demo-deploy
-spec:
-  replicas: {n}
-"""
-# run kubectl
-def kubectl(cmd, patch):
-  with open(f"deploy/patch.yaml", "w") as f:
-    f.write(patch)
-  res = subprocess.run(["kubectl", cmd, "-k", "deploy"], capture_output=True)
-  return res.stdout.decode()
-```
----
+# What is next?
 
-# Implementing the operator
+- Setup Pyhon and Kopf
+- Authentication
+- Reacting to Events
+- Invoking Kubectl and Kustomnize
+- Implementing the Operator
 
-```python
-@kopf.on.create('nuvolaris.org', 'v1', 'samples')
-def sample_create(spec, **kwargs):
-    count = spec["count"]
-    message = kubectl("apply", patch(count))
-    return { "message": message }
-
-@kopf.on.delete('nuvolaris.org', 'v1', 'samples')
-def sample_delete(spec, **kwargs):
-    count = spec["count"]
-    message = kubectl("delete", patch(count))
-    return { "message": "delete" }
-```
-
----
-# Packaging
-
-- Create a Dockerfile embedding the operator
-  - You need `poetry`, `kopf` an `kubectl` in the image
-- Deploy the POD with the right permissions
-  - You need to setup *Kuberbetes RBAC*
-  - `ServiceAccount` and `ClusterRoleBinding`
-- See `nuvolaris/nuvolaris-operator` for an example
 ---
 ![bg](https://fakeimg.pl/800x600/fff/000/?text=Contributing)
 
@@ -470,14 +390,14 @@ def sample_delete(spec, **kwargs):
 ![bg fit](./image/components.png)
 
 ---
-# Required OpenSource Paperwork
-## Before sending a PR
+# Contributing to Nuvolaris
+## Before sending a Pull Request you need:
 
 - Add **Apache License** headers to each file:
-  quick way: `license-eye header fix`
-- Download the ICLA and sign it:
-  `bit.ly/apache-icla`
-- Send to 
-  `To: secretary@apache.org`
-  `Cc: secretary@nuvolaris.io`
+
+- The simplest way: 
+ `license-eye header fix`
+
+- There is a check for each Pull Request
+ ### Regular contributors need to sign the Apache ICLA
 

@@ -32,6 +32,8 @@
 		"eamodio.gitlens",
 		"mhutchie.git-graph",
 		"nicoespeon.slides",
-		"saviorisdead.theme-githubcleanwhite"
+		"saviorisdead.theme-githubcleanwhite",
+		"marp-team.marp-vscode",
+		"ryuta46.multi-command"
 	]
 }
