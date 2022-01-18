@@ -335,7 +335,6 @@ spec:
   count: 2
 ```
 ---
-
 # <!--!--> Demo
 ```txt
 cat demo-crd.yaml
@@ -414,7 +413,7 @@ mkdir deploy
 cp demo-deployment.yaml deploy
 cp patch.yaml deploy
 cp kustomization.yaml deploy
-#
+# kustomization deploy
 kubectl kustomize deploy | grep replica
 kubectl apply -k deploy
 kubectl get po

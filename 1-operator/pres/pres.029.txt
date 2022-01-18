@@ -1,0 +1,7 @@
+cat demo-crd.yaml
+kubectl apply -f demo-crd.yaml
+kubectl get crd
+cat demo-obj.yaml
+kubectl apply -f demo-obj.yaml
+kubectl get samples
+kubectl delete sample obj
