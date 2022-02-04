@@ -152,7 +152,7 @@ spec:
 
 
 ---
-# <!--!--> Demo
+# <!--!--> Demo CRD
 ```sh
 # check
 kubectl get nodes
@@ -166,7 +166,7 @@ kubectl apply -f demo-obj.yaml
 kubectl -n demo get sam
 # cleanup
 kubectl -n demo delete sam/obj
-kubectl delete crd samples.nuvolaris.org
+kubectl -n demo get sam
 ```
 ---
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Coding+an+Operator)
@@ -228,12 +228,12 @@ poetry run kopf
 # run demo1.py
 cat demo1.py
 poetry run kopf run demo1.py
-# note the error - missing crd
-kubectl apply -f demo-crd.yaml
+# note the error - add ns
 poetry run kopf run -n demo demo1.py
 # new terminal
 kubectl apply -f demo-obj.yaml
 kubectl -n demo get sam
+kubectl delete -f demo-obj.yaml
 ```
 
 ---
@@ -315,6 +315,7 @@ cp demo-deployment.yaml kustomization.yaml patch.yaml deploy
 kubectl apply -k deploy
 kubectl get deploy ; kubectl get po 
 kubectl delete -k deploy
+kubectl get deploy ; kubectl get po 
 ```
 ---
 
@@ -358,12 +359,13 @@ def sample_delete(spec, **kwargs):
 ---
 # <!--!--> Demo Operator
 ```sh
-kubectl apply -f demo-crd.yaml
+# cleanup
 kubectl delete -f demo-obj.yaml
 poetry run kopf run -n demo demo2.py
 # switch terminal
 cat demo-obj.yaml
 kubectl apply -f demo-obj.yaml
+# checking if it worked
 cat deploy/patch.yaml
 kubectl get deploy
 ```
@@ -376,21 +378,3 @@ kubectl get deploy
   - You need to setup *Kuberbetes RBAC*
   - `ServiceAccount` and `ClusterRoleBinding`
 - See `nuvolaris/nuvolaris-operator` for an example
----
-![bg](https://fakeimg.pl/800x600/fff/000/?text=Contributing)
-
----
-![bg fit](./image/components.png)
-
----
-# Required OpenSource Paperwork
-## Before sending a PR
-
-- Add **Apache License** headers to each file:
-  quick way: `license-eye header fix`
-- Download the ICLA and sign it:
-  `bit.ly/apache-icla`
-- Send to 
-  `To: secretary@apache.org`
-  `Cc: secretary@nuvolaris.io`
-
