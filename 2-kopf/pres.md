@@ -32,195 +32,20 @@ html: true
 # **Nuvolaris Trainings**
 ## Developing Kubernetes Operators in Python
 
-
 https://www.nuvolaris.io
 
 ---
 
 # Agenda
 
-- Kubernetes Introduction
-- Development Environment
-- Kubernetes Operators
-- Creating an Operator
-- Deploying an Operator
-- Contributing to Nuvolaris
+- Introducing Kubernetes Operators
+- Handling CRDs
+- Using Kustomize
+- Managing resources with perator
 
 ---
 
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes)
-
---- 
-# What is Kubernetes ?
-
-- In theory, an **orchestrator**
-  - also Windows, originally, was just a **GUI** on top of DOS
-
-- In practice, an **Operating System** for the cloud
-
-## What is Nuvolaris?
- - a Serverless **distribution** for Kubernetes
- - *Linux* : **RedHat** = *Kubernetes* : **Nuvolaris**
-
----
-
-![bg fit](image/kubernetes.png)
-
----
-# Kubernetes Operators
-
-- It is a **pattern** that is becoming commonplace
-  - There is *NOT* a specific API that you implement
-  - You have to use the *Kubernetes API* anyway
-- You define your own Resource 
-  - Defining new resources as **CRD** `Custom Resource Definitions`
-  - Creating instances conforming to the CRD
-    - that describes the *desidered state*
-  - **Writing code that brings the system to this state**
----
-
-![bg fit](./image/architecture.png)
- 
- ---
-# Operator Frameworks
-  - **Operator Framework**: ansible/helm/go
-  - **Kudo**: a declarative, yaml based framework
-  - **metacontroller**: generic, with hooks in any languages
-  - **shell-operator**: write operators in bash
-  - **kubebuilder**: Go based operator
-  - **kopf**: Python based Operator
-
-  also exists Java, Rust, Elixir, Javascript based operator frameworks
-
-
----
-
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Descriptors)
-
-
----
-
-### Kubernetes Descriptors Concepts 
-- It is declarative:
-  - You **describe** what you want to get by the system
-  - Kubernetes will bring the system to the desidered state
-
-- You declare what you want with *descriptors* in YAML
-  - those descriptors are in YAML format
-    - actually, they are internally JSON files 
-    - YAML is really syntax sugar for JSON
-- Kubernetes brings the system to what you asked
-  - ... **if it is possible** ...
-
----
-
-![bg fit](./image/map.png)
-
-
----
-
-# Structure of a descriptor
-
-- Common: Header and Metadata
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: nuvolaris
-```
-- `spec`: changes according tothe kind
-- `status`: maintained by the system
-
-
----
-# Simple Descriptor: a Pod
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: demo-pod
-  namespace: demo
-spec:
-  containers:
-    - name: nginx
-      image: nginx
-      ports:
-      - containerPort: 80
-````
-
----
-# Nested Descriptor: a Deployment
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: demo-deploy
-```
-
-Templatized, repeat the template using labels
-```yaml
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-```
----
-# Deployment template
-
-It creates `replica` times the pods specified in the template
-
-```yaml
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        ports:
-        - containerPort: 80
-```
-
-
----
-
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Dev+Environment)
-
----
-## VSCode-based Development Environment
-
-- Clone the repositories (multiple and linked)
-  ```
-  git clone https://github.com/nuvolaris/nuvolaris 
-  --recurse-submodules
-  ```
-  - do not forget **`--recurse-submodules`**
-
-- Open the folder `nuvolaris` with VSCode:
-  - Command Line: `code nuvolaris`
-- Open the workspaces in subfolders: `workspace.code-workspace`
-
----
-![bg fit](./image/start-dev-env.png)
-
----
-# Kubernetes `kubectl`
-
-- $ `kubectl get nodes`
-```
-NAME                      STATUS   ROLES                  AGE   VERSION
-nuvolaris-control-plane   Ready    control-plane,master   41m   v1.21.1
-nuvolaris-worker          Ready    <none>                 41m   v1.21.1
-```
-
-#### Demo: `nuvolaris-controller/training/transcript1.txt`
----
-
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+CRD)
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Operators)
 
 ---
 # Kubernetes Controllers
@@ -233,12 +58,27 @@ nuvolaris-worker          Ready    <none>                 41m   v1.21.1
 - create a set of resources
 - control them as an unit
 ---
+# Kubernetes Operators
 
+- It is a **pattern** that is becoming commonplace
+  - There is *NOT* a specific API that you implement
+  - You have to use the *Kubernetes API* anyway
+- You define your own Resource 
+  - Defining new resources as **CRD** `Custom Resource Definitions`
+  - Creating instances conforming to the CRD
+    - that describes the *desidered state*
+  - **Writing code that brings the system to this state**
+
+
+---
+![bg fit](image/architecture.png)
+
+---
 # Custom Resources Definitions
 
 - Define your own Kubernetes Resources
-  - create new Kinds of resources
-  - Handled as other resources
+  - Create new Kinds of resources
+  - You can then create instances of this new Kind
 
 # Resource Handlers
 
@@ -309,16 +149,34 @@ metadata:
 spec:
   count: 2
 ```
-- Demo: `nuvolaris/nuvolaris-controller/training/transcript2.txt`
+
+
 ---
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Operator)
+# <!--!--> Demo
+```sh
+# check
+kubectl get nodes
+cd lab
+kubectl apply -f demo-ns.yaml
+kubectl config set-context --current --namespace demo
+# create crd and instance
+kubectl apply -f demo-crd.yaml
+kubectl get crd
+kubectl apply -f demo-obj.yaml
+kubectl -n demo get sam
+# cleanup
+kubectl -n demo delete sam/obj
+kubectl delete crd samples.nuvolaris.org
+```
+---
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Coding+an+Operator)
 
 ---
 # About `kopf`
 - See kopf.readthedocs.io
 
 - Python based
-  - provied an handy `kopf` cli runner
+  - provided an handy `kopf` cli runner
 
 - Handlers for the various Kubernetes events:
   - `@kopf.on.login`
@@ -362,11 +220,26 @@ def sample_delete(spec, **kwargs):
 ```
 
 ---
+# <!--!--> Handling creation of objects
+```sh
+# install and run kopf
+poetry install
+poetry run kopf
+# run demo1.py
+cat demo1.py
+poetry run kopf run demo1.py
+# note the error - missing crd
+kubectl apply -f demo-crd.yaml
+poetry run kopf run -n demo demo1.py
+# new terminal
+kubectl apply -f demo-obj.yaml
+kubectl -n demo get sam
+```
 
+---
 ![bg](https://fakeimg.pl/800x600/fff/000/?text=Kustomize)
 
 ---
-
 # Interacting with Kubernetes
 
 - `kopf` does  *not* provide how to interact with Kubernetes
@@ -393,17 +266,15 @@ def sample_delete(spec, **kwargs):
 - Debug the output without applying with:
   `kubectl kustomize <folder>`
 ---
-
 ## Simple `kustomizationl.yaml` with patch
 
-``` yaml
+```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - demo-deployment.yaml
 patches:
  - path: patch.yaml
-
 ```
 
 - put it in a folder `deploy` and `apply -k deploy`
@@ -417,11 +288,34 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-deploy
+  namespace: demo
 spec:
-  replicas: 2
+  replicas: 1
 ```
-- Intuitively, provide enough context to locate the descriptor
-- Provide the replaced fields
+- Intuitively, provide enough *context* to locate the descriptor
+- Then, provide the **replaced fields**: `replicas: 1`
+---
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
+
+---
+# <!--!--> Demo Kustomize
+```sh
+cat demo-deployment.yaml
+kubectl apply -f demo-deployment.yaml
+kubectl get deploy ; kubectl get po
+kubectl delete deploy demo-deploy
+kubectl get deploy ; kubectl get po
+# kustomize
+cat kustomization.yaml
+cat patch.yaml
+# prepare the customization
+rm -Rvf deploy ; mkdir deploy
+cp demo-deployment.yaml kustomization.yaml patch.yaml deploy
+# apply the kustomization
+kubectl apply -k deploy
+kubectl get deploy ; kubectl get po 
+kubectl delete -k deploy
+```
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
@@ -446,7 +340,6 @@ def kubectl(cmd, patch):
   return res.stdout.decode()
 ```
 ---
-
 # Implementing the operator
 
 ```python
@@ -462,7 +355,18 @@ def sample_delete(spec, **kwargs):
     message = kubectl("delete", patch(count))
     return { "message": "delete" }
 ```
-
+---
+# <!--!--> Demo Operator
+```sh
+kubectl apply -f demo-crd.yaml
+kubectl delete -f demo-obj.yaml
+poetry run kopf run -n demo demo2.py
+# switch terminal
+cat demo-obj.yaml
+kubectl apply -f demo-obj.yaml
+cat deploy/patch.yaml
+kubectl get deploy
+```
 ---
 # Packaging
 

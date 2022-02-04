@@ -1,0 +1,59 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+- set_fact:
+    externalInterface: "{{ ansible_facts | dict2items | selectattr('value.ipv4', 'defined') | selectattr('value.ipv4.address', 'equalto', hostvars[inventory_hostname]['ansible_default_ipv4']['address']) | first }}"
+    externalIp: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- debug:
+    msg: "{{externalIp}} {{externalInterface}}"
+
+- name: allow access to port 6443
+  community.general.ufw:
+    rule: allow
+    port: '6443'
+    proto: tcp
+
+- name: forward port
+  community.general.ufw:
+    rule: allow
+    direction: in
+    proto: tcp
+    interface: "{{externalInterface.key}}"
+    from_port: '6443'
+    dest: "{{kube_master}}"
+    to_port: "{{kube_port}}"
+
+- name: copy the private key
+  copy: 
+    dest: /etc/ssh_priv_key
+    mode: '0600'
+    content: "{{ssh_privkey_b64 | b64decode }}"
+
+- name: extract kubeconfig
+  shell: >
+    ssh -i /etc/ssh_priv_key -o "StrictHostKeyChecking=no" root@{{kube_master}}
+    microk8s config
+    | sed -e 's/{{kube_master}}:{{kube_port}}/{{inventory_hostname}}:6443/g'
+    >/etc/kubeconfig
+
+- name: save locally the config
+  fetch:
+    src: /etc/kubeconfig
+    dest: "{{kube_config}}"
+    flat: yes
