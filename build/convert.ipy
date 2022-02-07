@@ -1,4 +1,5 @@
 import re, sys, tempfile
+import random
 if len(sys.argv) < 2:
     print("usage: <input>")
     sys.exit() 
@@ -6,10 +7,10 @@ input = sys.argv[1]
 file = input.split("/")[-1]
 dir = input[0:-len(file)]
 name =  file[0:-3]
-tmpdir = tempfile.TemporaryDirectory()
+tmpdir = f"/tmp/convert{random.randint(1000,10000)}"
 outdir = f"{dir}/pres"
-!mkdir -p {tmpdir.name} {outdir}
-!marp --allow-local-files -o {tmpdir.name}/{name}  --images png {input}
+!mkdir -p {tmpdir} {outdir}
+!marp --allow-local-files -o {tmpdir}/{name}  --images png {input}
 !marp --allow-local-files {input} -o {dir}/{name}.pdf --pdf
 
 def copy(src, dst):
@@ -37,7 +38,7 @@ while True:
         continue
     count +=1
     if count < 1: continue
-    prefix = f"{tmpdir.name}/{name}.%03d." % count
+    prefix = f"{tmpdir}/{name}.%03d." % count
     curr = "%spng" % prefix
     #print(prefix)
     line = f.readline()

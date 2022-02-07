@@ -26,7 +26,6 @@ html: true
   ~ under the License.
   ~
 -->
-
 ![bg left:40% 80%](./image/logo-full-transparent.png)
 
 # **Nuvolaris Trainings**
@@ -35,14 +34,13 @@ html: true
 https://www.nuvolaris.io
 
 ---
-
 # Agenda
 
 - Introducing Kubernetes Operators
-- Handling CRDs
-- Using Kustomize
-- Managing resources with perator
-
+- Defining CRDs and instances
+- Using Kustomize for deployment
+- Managing resources with the operator
+- Packaging
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Kubernetes+Operators)
@@ -69,7 +67,6 @@ https://www.nuvolaris.io
     - that describes the *desidered state*
   - **Writing code that brings the system to this state**
 
-
 ---
 ![bg fit](image/architecture.png)
 
@@ -87,7 +84,6 @@ https://www.nuvolaris.io
   - It interacts with Kubernetes APIs to perform operations
 
 ---
-
 # Components of a CRD
 
 - Group, Kind and short names:
@@ -155,8 +151,8 @@ spec:
 # <!--!--> Demo CRD
 ```sh
 # check
-kubectl get nodes
 cd lab
+kubectl get nodes
 kubectl apply -f demo-ns.yaml
 kubectl config set-context --current --namespace demo
 # create crd and instance
@@ -169,6 +165,7 @@ kubectl -n demo delete sam/obj
 kubectl -n demo get sam
 ```
 ---
+
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Coding+an+Operator)
 
 ---
@@ -196,10 +193,10 @@ kubectl -n demo get sam
 def sample_login(**kwargs):
     token = '/var/run/secrets/kubernetes.io/serviceaccount/token'
     if os.path.isfile(token):
-        logging.debug("found serviceaccount token: login via pykube in kubernetes")
-        return kopf.login_via_pykube(**kwargs)
+        logging.debug("found serviceaccount token: login via service account in kubernetes")
+        return kopf.login_with_service_account(**kwargs) 
     logging.debug("login via client")
-    return kopf.login_via_client(**kwargs)
+    return  kopf.login_with_kubeconfig(**kwargs)
 ```
 
 ---
@@ -227,8 +224,7 @@ poetry install
 poetry run kopf
 # run demo1.py
 cat demo1.py
-poetry run kopf run demo1.py
-# note the error - add ns
+# run the operator specifying the namespace
 poetry run kopf run -n demo demo1.py
 # new terminal
 kubectl apply -f demo-obj.yaml
@@ -237,6 +233,7 @@ kubectl delete -f demo-obj.yaml
 ```
 
 ---
+
 ![bg](https://fakeimg.pl/800x600/fff/000/?text=Kustomize)
 
 ---
@@ -294,8 +291,6 @@ spec:
 ```
 - Intuitively, provide enough *context* to locate the descriptor
 - Then, provide the **replaced fields**: `replicas: 1`
----
-![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
 
 ---
 # <!--!--> Demo Kustomize
@@ -317,6 +312,10 @@ kubectl get deploy ; kubectl get po
 kubectl delete -k deploy
 kubectl get deploy ; kubectl get po 
 ```
+---
+
+![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
+
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Implementing+Operator)
@@ -367,7 +366,7 @@ cat demo-obj.yaml
 kubectl apply -f demo-obj.yaml
 # checking if it worked
 cat deploy/patch.yaml
-kubectl get deploy
+kubectl get deploy ; kubectl get po
 ```
 ---
 # Packaging
