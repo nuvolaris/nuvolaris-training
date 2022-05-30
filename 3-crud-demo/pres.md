@@ -3,16 +3,17 @@
 ## cleanup
 cd ../demo
 rm -Rvf addr
+wsk package update addr -p redis redis://redis
 wsk action update addr/delall delall.js
 wsk action invoke addr/delall -r
 wsk action list | awk '/private/ { print $1 }' | xargs -L1 wsk action delete 
 wsk package delete addr
 
 ## create packages and actions
-
 wsk package list
 wsk action list
 
+# check connectivity to redis
 code -a ping.js
 wsk package update addr -p redis redis://redis
 wsk action update addr/ping ping.js
@@ -20,17 +21,15 @@ wsk action invoke addr/ping -r
 
 ## get set and del
 code -a get.js
-code -a set.js
-code -a del.js
-
-## check we are ready
-wsk action update addr/set set.js --web=true
 wsk action update addr/get get.js --web=true
+code -a set.js
+wsk action update addr/set set.js --web=true
+code -a del.js
 wsk action update addr/del del.js --web=true
 
 # Test the actions
 
-wsk action invoke addr/set -p name Michele -p company Nimbella -p phone 392 -r
+wsk action invoke addr/set -p name Michele -p company Nuvolaris -p phone 392 -r
 wsk action invoke addr/get -p name Michele -r
 wsk action invoke addr/del -p name Michele -r
 wsk action invoke addr/get -p name Michele -r
@@ -39,7 +38,7 @@ wsk action invoke addr/get -p name Michele -r
 code -a all.js
 wsk action update addr/all all.js --web=true
 wsk action invoke addr/all -r
-wsk action invoke addr/set -p name Michele -p company Nimbella -p phone 392 -r
+wsk action invoke addr/set -p name Michele -p company Nuvolaris -p phone 392 -r
 wsk action invoke addr/all -r
 wsk action invoke addr/set -p name Mirella -p company Sciabarra -p phone 328 -r
 wsk action invoke addr/all -r
