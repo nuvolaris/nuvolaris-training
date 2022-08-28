@@ -13,3 +13,4 @@ nuv l --last
 # test function
 nuv invoke addr2/set name=Mirella company=Nuvolaris phone=328
 
+prova
