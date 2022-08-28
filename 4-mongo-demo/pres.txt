@@ -1,0 +1,72 @@
+# Init
+
+## cleanup
+cd ../demo
+rm -Rvf addr
+cd demo
+nuv package update addr -p redis redis://redis
+nuv  action update addr/delall delall.js
+nuv  action invoke addr/delall -r
+nuv  action list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk action delete 
+nuv  package list | awk '/private/ { print $1 }' | xargs -L1 echo nuv wsk package delete 
+nuv  package delete addr
+
+## create packages and actions
+nuv package list
+nuv action list
+
+# check connectivity to redis
+code -a ping.js
+nuv package update addr -p redis redis://redis
+nuv action update addr/ping ping.js
+nuv action invoke addr/ping -r
+
+## get set and del
+code -a get.js
+nuv action update addr/get get.js --web=true
+code -a set.js
+nuv action update addr/set set.js --web=true
+code -a del.js
+nuv action update addr/del del.js --web=true
+
+# Test the actions
+
+nuv invoke addr/set -p name Michele -p company Nuvolaris -p phone 392 
+nuv i addr/get name=Michele 
+nuv i addr/del name=Michele
+nuv i addr/get name=Michele
+
+# Get all data
+code -a all.js
+nuv action update addr/all all.js --web=true
+nuv invoke addr/all
+nuv invoke addr/set name=Michele company=Nuvolaris phone=392
+nuv invoke addr/all
+nuv invoke addr/set name=Mirella company=Sciabarra phone=328
+nuv invoke addr/all
+
+# Create svelte app
+## IN ANOTHER TERMINAL **
+cd nuvolaris-training/3-crud-demo/demo
+npx degit sveltejs/template addr
+cd addr
+npm install
+npm run dev
+## BACK TO THE FIRST ##
+
+# Create a Svelte app
+code -a App1.svelte
+code -a App2.svelte
+cat App1.svelte App2.svelte >addr/src/App.svelte
+
+# Add an entry
+code -a App2a.svelte
+code -a App1a.svelte
+cat App1.svelte App1a.svelte App2.svelte App2a.svelte >addr/src/App.svelte
+
+# Remove an entry
+code -a App1b.svelte
+code -a App2b.svelte
+cat App1.svelte App1a.svelte App1b.svelte App2.svelte App2a.svelte App2b.svelte >addr/src/App.svelte
+
+
