@@ -1,0 +1,26 @@
+version: 3
+
+tasks:
+
+  start: 
+      - >
+        echo docker run -d -p 27017:27017
+        -e MONGO_INITDB_ROOT_USERNAME=root
+        -e MONGO_INITDB_ROOT_PASSWORD=password
+        --rm --name mongo mongo:latest
+      - >
+        echo 'db.createUser({ "user": "nuv", "pwd":"nuv", roles: [ { "role": "readWrite", "db": "test" }]})'
+        | docker exec -i mongo mongosh -u root -p password
+      
+
+  etc: |-
+      # da sistemare
+      mongosh -u root -p password
+      use test
+      db.createUser({ "user": "nuv", "pwd":"nuv", roles: [ { "role": "readWrite", "db": "test" }]})
+      mongosh mongodb://nuv:nuv@localhost:27017/test
+
+  stop: docker kill mongo
+
+  enter: docker exec -ti mongo bash
+

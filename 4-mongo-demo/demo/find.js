@@ -7,7 +7,7 @@ async function main(args) {
     await client.connect()
     // insert
     const address = client.db().collection("address")
-    return address.deleteOne({
+    return address.findOne({
         "name": args.name 
     })
 }

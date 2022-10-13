@@ -1,53 +1,61 @@
 # Init
 
 ## cleanup
-cd ../demo
+nuv() {
+    if [[ "$1" == "action" ]] && [[ "$2" == "update" ]]
+    then /usr/local/bin/nuv "$@" --docker ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
+    else /usr/local/bin/nuv "$@"
+    fi
+}
+
+pwd #should be demo
 rm -Rvf addr
-cd demo
-nuv package update addr -p redis redis://redis
 nuv  action update addr/delall delall.js
 nuv  action invoke addr/delall -r
-nuv  action list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk action delete 
-nuv  package list | awk '/private/ { print $1 }' | xargs -L1 echo nuv wsk package delete 
-nuv  package delete addr
+nuv action list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk action delete 
+nuv package list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk package delete 
+
+MONGODB="mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+nuv package update addr -p mongodb "$MONGODB"
+
+//nuv package update addr -p mongodb 'mongodb://nuvolaris:nx2Tech715!@10.42.168.89/nuvolaris01'
 
 ## create packages and actions
 nuv package list
 nuv action list
 
-# check connectivity to redis
+# check connectivity to mongo
 code -a ping.js
-nuv package update addr -p redis redis://redis
-nuv action update addr/ping ping.js
-nuv action invoke addr/ping -r
+nuv action update addr/ping ping.js 
+nuv invoke addr/ping
 
 ## get set and del
-code -a get.js
-nuv action update addr/get get.js --web=true
-code -a set.js
-nuv action update addr/set set.js --web=true
+code -a find.js
+nuv action update addr/find find.js --web=true
+code -a insert.js
+nuv action update addr/insert insert.js --web=true
 code -a del.js
 nuv action update addr/del del.js --web=true
 
 # Test the actions
 
-nuv invoke addr/set -p name Michele -p company Nuvolaris -p phone 392 
-nuv i addr/get name=Michele 
+nuv i addr/insert name=Michele company=Nuvolaris phone=392 
+nuv i addr/find name=Michele 
 nuv i addr/del name=Michele
-nuv i addr/get name=Michele
+nuv i addr/find name=Michele
 
 # Get all data
 code -a all.js
 nuv action update addr/all all.js --web=true
 nuv invoke addr/all
-nuv invoke addr/set name=Michele company=Nuvolaris phone=392
+nuv invoke addr/insert name=Michele company=Nuvolaris phone=392
 nuv invoke addr/all
-nuv invoke addr/set name=Mirella company=Sciabarra phone=328
+nuv invoke addr/insert name=Mirella company=Sciabarra phone=328
 nuv invoke addr/all
 
 # Create svelte app
 ## IN ANOTHER TERMINAL **
-cd nuvolaris-training/3-crud-demo/demo
+pwd
 npx degit sveltejs/template addr
 cd addr
 npm install

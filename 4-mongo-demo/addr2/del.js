@@ -1,7 +1,6 @@
 const { MongoClient } = require('mongodb');
 const { ObjectId } = require('mongodb');
 
-
 async function main(args) {
     
     const client = new MongoClient(args.dburi);

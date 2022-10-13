@@ -5,10 +5,11 @@ async function main(args) {
     // connect
     const client = new MongoClient(args.mongodb);
     await client.connect()
-    // find all
+    // insert
     const address = client.db().collection("address")
-    let res = []
-    await address.find().forEach(x => res.push(x))
-    return { "body": res }
+    return address.insertOne({
+        "name": args.name || "",
+        "company": args.company || "", 
+        "phone": args.phone || ""
+    })
 }
-

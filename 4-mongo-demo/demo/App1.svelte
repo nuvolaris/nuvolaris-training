@@ -1,7 +1,7 @@
 <script>
     // configurations
     import { onMount } from 'svelte'
-    let base =  "http://localhost:3233/api/v1/web/nuvolaris/addr/"
+    let base =  "http://dev.nuvolaris.io/api/v1/web/nuvolaris/addr/"
 
     // data
     let data = []

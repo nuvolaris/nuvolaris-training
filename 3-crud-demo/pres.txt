@@ -1,7 +1,7 @@
 # Init
 
 ## cleanup
-cd ../demo
+pwd #should be demo
 rm -Rvf addr
 wsk package update addr -p redis redis://redis
 wsk action update addr/delall delall.js
@@ -9,7 +9,8 @@ wsk action invoke addr/delall -r
 wsk action list | awk '/private/ { print $1 }' | xargs -L1 wsk action delete 
 wsk package delete addr
 
-## create packages and actions
+### Start Demo
+# check empty
 wsk package list
 wsk action list
 
@@ -17,6 +18,10 @@ wsk action list
 code -a ping.js
 wsk package update addr -p redis redis://redis
 wsk action update addr/ping ping.js
+wsk package list
+wsk action list
+
+# invoke
 wsk action invoke addr/ping -r
 
 ## get set and del
@@ -26,6 +31,7 @@ code -a set.js
 wsk action update addr/set set.js --web=true
 code -a del.js
 wsk action update addr/del del.js --web=true
+wsk action list 
 
 # Test the actions
 
@@ -45,7 +51,7 @@ wsk action invoke addr/all -r
 
 # Create svelte app
 ## IN ANOTHER TERMINAL **
-cd nuvolaris-training/3-crud-demo/demo
+pwd # should be demo
 npx degit sveltejs/template addr
 cd addr
 npm install
@@ -56,15 +62,17 @@ npm run dev
 code -a App1.svelte
 code -a App2.svelte
 cat App1.svelte App2.svelte >addr/src/App.svelte
+open http://localhost:8080
 
 # Add an entry
 code -a App2a.svelte
 code -a App1a.svelte
 cat App1.svelte App1a.svelte App2.svelte App2a.svelte >addr/src/App.svelte
+open http://localhost:8080
 
 # Remove an entry
 code -a App1b.svelte
 code -a App2b.svelte
 cat App1.svelte App1a.svelte App1b.svelte App2.svelte App2a.svelte App2b.svelte >addr/src/App.svelte
-
+open http://localhost:8080
 

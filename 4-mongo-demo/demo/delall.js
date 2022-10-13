@@ -1,11 +1,11 @@
+//let args = {"mongodb":"mongodb://nuv:nuv@localhost:27017/test" }
+const {MongoClient} = require('mongodb');
+
 async function main(args) {
-
-    const db = require("redis").createClient({"url":args.redis})
-    await db.connect()
-
-    let keys = await db.keys("address:*")
-
-    return  db.del(keys)
-    .then(reply => ({ "delall":reply}))
-    .catch(err =>  ({ "error": err}))
+    // connect
+    const client = new MongoClient(args.mongodb);
+    await client.connect()
+    // insert
+    const address = client.db().collection("address")
+    return address.deleteMany({})
 }
