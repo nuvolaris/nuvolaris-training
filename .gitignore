@@ -21,3 +21,4 @@
 __pycache__/
 **/lab/deploy/
 .vscode/
+node_modules/

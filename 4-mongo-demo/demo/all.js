@@ -9,6 +9,6 @@ async function main(args) {
     const address = client.db().collection("address")
     let res = []
     await address.find().forEach(x => res.push(x))
-    return { "body": res }
+    return { "data": res }
 }
 

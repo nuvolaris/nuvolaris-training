@@ -66,6 +66,7 @@ npm run dev
 code -a App1.svelte
 code -a App2.svelte
 cat App1.svelte App2.svelte >addr/src/App.svelte
+open http://localhost:8080
 
 # Add an entry
 code -a App2a.svelte
