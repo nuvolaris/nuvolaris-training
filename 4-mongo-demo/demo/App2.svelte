@@ -7,10 +7,10 @@
     {#each data as row}
       <tr>
         <td><input type="radio" bind:group={select} 
-                  value={row.name}></td>
-        <td>{row.name}</td>
-        <td><tt>{row.company}</tt></td>
-        <td><i>{row.phone}</i></td>
+                   value={row.name}></td>
+        <td><b>{row.name}</b></td>
+        <td><i>{row.company}</i></td>
+        <td><tt>{row.phone}</tt></td>
       </tr>
     {/each}
   </table>

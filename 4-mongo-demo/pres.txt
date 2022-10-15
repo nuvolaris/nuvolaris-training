@@ -1,5 +1,8 @@
 # Init
+cd demo
 source nuv.src
+MONGODB="mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+//nuv package update addr -p mongodb 'mongodb://nuvolaris:nx2Tech715!@10.42.168.89/nuvolaris01'
 
 ## cleanup
 pwd #should be demo
@@ -9,14 +12,13 @@ nuv  action invoke addr/delall -r
 nuv action list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk action delete 
 nuv package list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk package delete 
 
-MONGODB="mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
-nuv package update addr -p mongodb "$MONGODB"
 
-//nuv package update addr -p mongodb 'mongodb://nuvolaris:nx2Tech715!@10.42.168.89/nuvolaris01'
+### START
 
 ## create packages and actions
 nuv package list
 nuv action list
+nuv package update addr -p mongodb "$MONGODB"
 
 # check connectivity to mongo
 code -a ping.js
@@ -49,17 +51,17 @@ nuv invoke addr/all
 
 # Create svelte app
 ## IN ANOTHER TERMINAL **
-pwd
+pwd #shuld be demo
 npx degit sveltejs/template addr
 cd addr
 npm install
 # <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
 code -a public/index.html 
 npm run dev
-open http://localhost:8080
 ## BACK TO THE FIRST ##
 
 # Create a Svelte app
+open http://localhost:8080
 code -a App1.svelte
 code -a App2.svelte
 cat App1.svelte App2.svelte >addr/src/App.svelte
@@ -86,9 +88,11 @@ nuv package delete addr
 # empty
 nuv action list
 
-# bundling
+# bundling the frontend
 nuv bundle addr/public
+# deploying everything
 code -a manifest.yaml
 nuv project deploy
+# access the app
 nuv action list
 nuv url addr/app
