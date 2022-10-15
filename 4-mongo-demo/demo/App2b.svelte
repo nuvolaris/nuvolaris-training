@@ -1,1 +1,4 @@
-<button on:click={remove}>Remove</button>
+<main><section>
+  <button on:click={submit}>Add</button>
+</section></main>
+  

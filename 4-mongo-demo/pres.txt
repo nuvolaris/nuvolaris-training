@@ -1,13 +1,7 @@
 # Init
+source nuv.src
 
 ## cleanup
-nuv() {
-    if [[ "$1" == "action" ]] && [[ "$2" == "update" ]]
-    then /usr/local/bin/nuv "$@" --docker ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
-    else /usr/local/bin/nuv "$@"
-    fi
-}
-
 pwd #should be demo
 rm -Rvf addr
 nuv  action update addr/delall delall.js
@@ -30,10 +24,10 @@ nuv action update addr/ping ping.js
 nuv invoke addr/ping
 
 ## get set and del
-code -a find.js
-nuv action update addr/find find.js --web=true
 code -a insert.js
 nuv action update addr/insert insert.js --web=true
+code -a find.js
+nuv action update addr/find find.js --web=true
 code -a del.js
 nuv action update addr/del del.js --web=true
 
@@ -59,7 +53,10 @@ pwd
 npx degit sveltejs/template addr
 cd addr
 npm install
+# <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+code -a public/index.html 
 npm run dev
+open http://localhost:8080
 ## BACK TO THE FIRST ##
 
 # Create a Svelte app
@@ -71,11 +68,27 @@ open http://localhost:8080
 # Add an entry
 code -a App2a.svelte
 code -a App1a.svelte
-cat App1.svelte App1a.svelte App2.svelte App2a.svelte >addr/src/App.svelte
+code -a App2b.svelte
+cat App1.svelte App1a.svelte App2.svelte App2a.svelte  App2b.svelte >addr/src/App.svelte
 
 # Remove an entry
 code -a App1b.svelte
-code -a App2b.svelte
-cat App1.svelte App1a.svelte App1b.svelte App2.svelte App2a.svelte App2b.svelte >addr/src/App.svelte
+code -a App2c.svelte
+cat App1.svelte App1a.svelte App1b.svelte App2.svelte App2a.svelte App2c.svelte >addr/src/App.svelte
 
+# remove
+nuv a delete addr/insert
+nuv a delete addr/find
+nuv a delete addr/del
+nuv a delete addr/all
+nuv a delete addr/ping
+nuv package delete addr
+# empty
+nuv action list
 
+# bundling
+nuv bundle addr/public
+code -a manifest.yaml
+nuv project deploy
+nuv action list
+nuv url addr/app

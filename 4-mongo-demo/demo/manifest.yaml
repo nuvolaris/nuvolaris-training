@@ -1,0 +1,33 @@
+packages:
+  addr:
+    actions:
+      all:
+        function:  all.js
+        web: true
+        docker: ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
+        inputs:
+          mongodb: "mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+      insert:
+        function: insert.js
+        web: true
+        docker: ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
+        inputs:
+          mongodb: "mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+      find:
+        function: find.js
+        web: true
+        docker: ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
+        inputs:
+          mongodb: "mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+      del:
+        function: del.js
+        web: true
+        docker: ghcr.io/nuvolaris/action-nodejs-v14:0.3.0-morpheus.22081008
+        inputs:
+          mongodb: "mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
+      app:
+        function: bundle.zip
+        runtime: nodejs:default
+        web: true
+
+      
