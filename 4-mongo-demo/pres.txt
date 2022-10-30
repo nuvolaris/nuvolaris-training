@@ -1,14 +1,17 @@
 # Init
 cd demo
+source ../nuv-dev.src
+#source ../nuv-nutanix.src
+nuv action list
 source nuv.src
-MONGODB="mongodb://nuvolaris:s3cr3t@nuvolaris-mongodb-0.nuvolaris-mongodb-svc/nuvolaris"
-//nuv package update addr -p mongodb 'mongodb://nuvolaris:nx2Tech715!@10.42.168.89/nuvolaris01'
 
 ## cleanup
 pwd #should be demo
+echo $MONGODB #should be set
 rm -Rvf addr
-nuv  action update addr/delall delall.js
-nuv  action invoke addr/delall -r
+nuv package update addr -p mongodb "$MONGODB"
+nuv action update addr/delall delall.js
+nuv action invoke addr/delall -r
 nuv action list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk action delete 
 nuv package list | awk '/private/ { print $1 }' | xargs -L1 nuv wsk package delete 
 
@@ -34,7 +37,6 @@ code -a del.js
 nuv action update addr/del del.js --web=true
 
 # Test the actions
-
 nuv i addr/insert name=Michele company=Nuvolaris phone=392 
 nuv i addr/find name=Michele 
 nuv i addr/del name=Michele
