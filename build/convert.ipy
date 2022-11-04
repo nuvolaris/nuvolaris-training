@@ -46,7 +46,7 @@ while True:
     if line.find("<!--!-->") != -1:
         line = f.readline()
     line = line.rstrip()
-    if line.startswith("!["):
+    if line.startswith("![") and not line.find("(http"):
         m = re.search('\((.*/(.*))\)', line)
         src = f"{dir}/{m.group(1)}"
         dst = f"{outdir}/{name}.%03d.png" % count
