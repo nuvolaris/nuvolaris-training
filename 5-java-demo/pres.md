@@ -7,15 +7,6 @@ backgroundColor: #fff
 backgroundImage: url('https://marp.app/assets/hero-background.jpg')
 html: true
 ---
-
-![bg left:40% 80%](./image/logo-full-transparent.png)
-
-# **Nuvolaris Trainings**
-## Java Demo
-
-https://www.nuvolaris.io
-
----
 # <!--!--> Init
 ```sh
 echo "drop table addr;" | psql address
@@ -27,13 +18,20 @@ oc project nuvolaris
 oc get pod
 ```
 ---
+![bg left:40% 80%](./image/logo-full-transparent.png)
 
+# **Nuvolaris Trainings**
+## Java Demo
+
+https://www.nuvolaris.io
+
+---
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Initialization)
 
 ---
-# <!--!--> Connection to the database
+# Connection to the database
 ```java
-// conneciton url passed as parameter
+// connection url passed as parameter
 String postgres = args.getAsJsonPrimitive("postgres").getAsString();
 // creating connection
 Class.forName("org.postgresql.Driver");
@@ -41,7 +39,7 @@ Connection conn = DriverManager.getConnection(postgres);
 ```
 
 ---
-# <!--!--> Creating the table
+# Creating the table
 ```java
         // create the table
         Statement stmt = conn.createStatement();
@@ -75,8 +73,7 @@ oc get pod
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=CRUD)
 
 ---
-# <!--!--> Insert and Delete
-
+# Insert and Delete
 ```java
         // insert
         PreparedStatement prep = conn.prepareStatement(
@@ -99,8 +96,7 @@ oc get pod
 ```
 
 ---
-# <!--!--> Select
-
+# Select
 ```java
         ResultSet rs = stmt.executeQuery(
             "SELECT id,name,phone,email from addr");
@@ -121,7 +117,6 @@ oc get pod
 
 ---
 # <!--!--> Deploy
-
 ```sh
 # deploy
 nuv action update address/insert address/Insert.java --main=Insert --web=true
@@ -135,7 +130,6 @@ nuv invoke address/select
 nuv invoke address/delete id=1
 nuv invoke address/select
 ```
-
 ---
 
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=FrontEnd)
@@ -144,9 +138,8 @@ nuv invoke address/select
 
 ![bg](image/crud.jpg)
 
-
 ---
-# <!--!-->
+#### HTML
 ![bg 70% right](image/form.png)
 ```html
 <main><section>
@@ -172,7 +165,6 @@ nuv invoke address/select
 
 ---
 ```js
-// data
 let select = ""
 let data = []
 let form = {}
@@ -184,8 +176,7 @@ async function all()  {
 function submit() {
         fetch(base+"insert", { method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(form) })
-        .then(all)
+            body: JSON.stringify(form) }).then(all)
         form = {}
 }
 function remove() {
@@ -198,8 +189,11 @@ onMount(all)
 ---
 # <!--!--> Building and Deploying Frontend
 ```sh
+# create a template
 npx degit sveltejs/template addr
+# copy sources
 cp -v App.svelte addr/src
+# run it
 cd addr
 npm install
 npm run dev
@@ -210,6 +204,7 @@ npm run dev
 ![bg](https://fakeimg.pl/800x200/fff/000/?text=Bundling)
 
 ---
+# <!--!--> Bundling
 ```sh
 # cleanup
 nuv action list | awk '/private/{ print $1}' | xargs -L1 nuv action delete
@@ -221,3 +216,4 @@ nuv project deploy
 nuv action list
 nuv url address/app
 curl $(nuv url address/app)
+```
