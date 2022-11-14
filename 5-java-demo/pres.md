@@ -9,10 +9,12 @@ html: true
 ---
 # <!--!--> Init
 ```sh
+ssh -L8080:127.0.0.1:8080 devkit
 echo "drop table addr;" | psql address
 source nuv.src
 nuv action list | awk '/private/{ print $1}' | xargs -L1 nuv action delete
 nuv package delete address
+rm -Rvf addr
 oc login -u nuvolaris -p s3cr3t
 oc project nuvolaris
 oc get pod
@@ -112,7 +114,6 @@ oc get pod
         JsonObject response = new JsonObject();
         response.add("data", result);
         return response;
-    }
 ```
 
 ---
@@ -169,15 +170,15 @@ let select = ""
 let data = []
 let form = {}
 async function all()  {
-      let res = await fetch(base+"select.json")
-      let body = await res.json()
-      data = body.data
+  let res = await fetch(base+"select.json")
+  let body = await res.json()
+  data = body.data
 }
 function submit() {
-        fetch(base+"insert", { method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(form) }).then(all)
-        form = {}
+    fetch(base+"insert", { method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(form) }).then(all)
+    form = {}
 }
 function remove() {
     fetch(base+"delete?id="+select).then(all).catch(console.log)
