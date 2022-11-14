@@ -1,0 +1,30 @@
+packages:
+  address:
+    actions:
+      select:
+        function:  address/Select.java
+        web: true
+        main: Select
+        docker: ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809
+        inputs:
+          postgres: "jdbc:postgresql://yyy.nuvolaris.io/address?user=ubuntu&password=xxxx"
+      insert:
+        function:  address/Insert.java
+        web: true
+        main: Insert
+        docker: ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809
+        inputs:
+          postgres: "jdbc:postgresql://yyy.nuvolaris.io/address?user=ubuntu&password=xxxx"
+      delete:
+        function:  address/Delete.java
+        web: true
+        main: Delete
+        docker: ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809
+        inputs:
+          postgres: "jdbc:postgresql://yyy.nuvolaris.io/address?user=ubuntu&password=xxxx"
+      app:
+        function: bundle.zip
+        docker:  ghcr.io/nuvolaris/action-nodejs-v16:0.3.0-morpheus.22111407
+        web: true
+
+      

@@ -1,0 +1,27 @@
+export IMG=ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809
+export POSTGRES="jdbc:postgresql://devkit.nuvolaris.io/address?user=ubuntu&password=p4ssWord"
+
+nuv() {
+    if [[ "$1" == "action" ]] && [[ "$2" == "update" ]]
+    then /usr/local/bin/nuv "$@" --docker "$IMG"
+         return
+    fi
+    if [[ "$1" == "bundle" ]] 
+    then
+        if test -d "$2"
+        then
+          cp index.js "$2"/index.js
+          echo '{"main": "index.js"}' >"$2/package.json"
+          pushd "$2" >/dev/null
+          rm -f bundle.zip
+          zip -r bundle.zip *
+          popd >/dev/null
+          mv "$2/bundle.zip" .
+          echo "Bundle: bundle.zip"
+        else
+          echo "not found $2"
+        fi
+        return
+    fi
+    /usr/local/bin/nuv "$@"
+}

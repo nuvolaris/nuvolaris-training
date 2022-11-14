@@ -1,0 +1,38 @@
+sudo -i -u postgres psql
+create database address;
+create user ubuntu with encrypted password 'XXXXXX';
+grant all privileges on database address to ubuntu;
+quit
+psql  address
+create table address(id serial primary key, name varchar(20), phone numeric, email varchar(20));
+create table guest(id serial primary key, message varchar(20));
+insert into guest(message) values('hello');
+insert into guest(message) values('world');
+
+select * from guest;
+
+jshell -class-path lib/gson-2.8.5.jar:lib/postgresql-42.5.0.jar 
+javac -cp lib/gson-2.8.5.jar:lib/pcdostgresql-42.5.0.jar  query/*.java
+java -cp query:lib/gson-2.8.5.jar:lib/postgresql-42.5.0.jar MainTest
+
+nuv action update helloj hello/Main.java --docker ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809
+nuv action invoke helloj -r
+
+---
+IMG=`ghcr.io/nuvolaris/action-java-v8:0.3.0-morpheus.22110809`
+URL="jdbc:postgresql://YYYYYY.nuvolaris.io/address?user=ubuntu&password=XXXXX"
+
+nuv package update address -p postgres "$URL"
+nuv action update address/init address/Init.java --main Init --docker "$IMG"
+nuv i address/init
+
+nuv action update address/insert address/Insert.java --main Insert --docker "$IMG"
+nuv i address/insert name=Michele phone=392 email=mike
+
+nuv action update address/select address/Select.java --main Select --docker "$IMG"
+nuv i address/select
+nuv i address/insert name=Mirella phone=328 email=miri
+nuv i address/select
+
+nuv action update address/delete address/Delete.java --main Delete --docker "$IMG"
+nuv i address/delete id=1
