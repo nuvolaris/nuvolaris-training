@@ -1,4 +1,6 @@
 ssh -L8080:127.0.0.1:8080 devkit
+z 5-java-demo
+PS1="\$ "
 echo "drop table addr;" | psql address
 source nuv.src
 nuv action list | awk '/private/{ print $1}' | xargs -L1 nuv action delete

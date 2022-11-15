@@ -6,3 +6,4 @@ cp -v App.svelte addr/src
 cd addr
 npm install
 npm run dev
+# http://localhost:8080
